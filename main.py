@@ -14,17 +14,21 @@ class GetInfo:
     def __init__(self):
         self.excel = 'info.xls'
 
-
     def get_hosts(self):
         data = pd.read_excel(self.excel)
         # 读取excel文件
-        return data["hostname"], data["ip"], data["username"], data["password"], data["commands"], data["notes"]
+        return data["hostname"], data["ip"], data["username"], data["password"], data["commands"]
 
-    def get_commands(file_name):
-        # 读取txt文件，并创建命令列表
-        with open(f"{file_name}.txt", encoding='utf-8') as fn:
-            ls = fn.readlines()
-        return ls
+    @staticmethod
+    def get_commands(file_name, folder_path="commands"):
+        file_path = os.path.join(folder_path, f"{file_name}.txt")
+        try:
+            with open(file_path, encoding='utf-8') as fn:
+                ls = fn.readlines()
+            return ls
+        except FileNotFoundError:
+            # print(f" {file_path} not found")
+            return []
 
 
 class CreateFiles:
@@ -53,11 +57,9 @@ class CreateFiles:
                 file.write(config.encode('utf-8'))
         file.close()
 
-
-    @staticmethod
-    def create_errorlog(hn):
+    def create_errorlog(self, hn):
         # now = time.strftime("%Y-%m-%d")
-        with open(f"discu-errorlog.log", 'a') as errorInfo:
+        with open(f"error.log", 'a') as errorInfo:
             errorInfo.write(f'\n{hn}-{time.strftime("%Y-%m-%d %X")}:\n')
             traceback.print_exc(file=errorInfo)
 
@@ -71,7 +73,7 @@ def decide_stdout(stdout):
         return 'n'
 
 
-def backup_config(device_name, ip, username, password, comm, note):
+def backup_config(device_name, ip, username, password, comm):
     # 保存交换机配置
     mk = CreateFiles()
     ssh = paramiko.SSHClient()
@@ -92,6 +94,8 @@ def backup_config(device_name, ip, username, password, comm, note):
         if out == 'y':
             ssh_shell.send(b'n\n')
         # 从txt获取命令
+        commands = GetInfo.get_commands(comm)
+        print(commands)
         for command in commands:
             ssh_shell.send(command.encode(encoding='utf-8'))
             ssh_shell.send(b'\n')
@@ -116,18 +120,14 @@ def backup_config(device_name, ip, username, password, comm, note):
         mk.create_errorlog(device_name)
 
 
-def muti_theard(device_name, ip, username, password, comm, note):
+def muti_theard(hosts):
     with ThreadPoolExecutor(max_workers=150) as executor:
-        for n, hn, un, pw, co, nt in zip(device_name, ip, username, password, comm, note):
-            # print(n, hn, un, pw, co, nt)
-            executor.submit(backup_config, n, hn, un, pw, co, nt)
+        for hn, ip, un, pw, co, nt in zip(*hosts):  # 使用 * 解包 hosts 元组
+            executor.submit(backup_config, hn, ip, un, pw, co)
 
 
 if __name__ == '__main__':
     mk_dir = CreateFiles()
     mk_dir.mkdir()
-    hosts = {"hostname": (GetInfo().get_hosts())[0], "ip": (GetInfo().get_hosts())[1],
-             "username": (GetInfo().get_hosts())[2], "password": (GetInfo().get_hosts())[3],
-             "commands": (GetInfo().get_hosts())[4], "notes": (GetInfo().get_hosts())[5]}
-    # print(hosts)
-    muti_theard(hosts["hostname"], hosts["ip"], hosts["username"], hosts["password"],  hosts["commands"], hosts["notes"])
+    hosts = GetInfo().get_hosts()
+    muti_theard(hosts)
