@@ -41,4 +41,3 @@ Output: The output from each command will be saved in the output/ folder for fut
     The script use SSH access to network devices.
 
 
-
