@@ -27,7 +27,7 @@ class GetInfo:
                 ls = fn.readlines()
             return ls
         except FileNotFoundError:
-            # print(f" {file_path} not found")
+            print(f" {file_path} not found")
             return []
 
 
@@ -37,7 +37,7 @@ class CreateFiles:
 
     def __init__(self):
         self.now = datetime.datetime.now().strftime('%Y%m%d')
-        self.file_path = f'config_bak{self.now}'
+        self.file_path = f'[{self.now}]config_bak'
 
     def mkdir(self):
         # 创建目录，如果目录存在先删除再创建
@@ -56,11 +56,10 @@ class CreateFiles:
             except TypeError:
                 file.write(config.encode('utf-8'))
         file.close()
-
-    def create_errorlog(self, hn):
-        # now = time.strftime("%Y-%m-%d")
+    @staticmethod
+    def create_error_log(hn):
         with open(f"error.log", 'a') as errorInfo:
-            errorInfo.write(f'\n{hn}-{time.strftime("%Y-%m-%d %X")}:\n')
+            errorInfo.write(f'\n[{time.strftime("%Y-%m-%d %X")}]{hn}:\n')
             traceback.print_exc(file=errorInfo)
 
 
@@ -95,7 +94,7 @@ def backup_config(device_name, ip, username, password, comm):
             ssh_shell.send(b'n\n')
         # 从txt获取命令
         commands = GetInfo.get_commands(comm)
-        print(commands)
+        # print(commands)
         for command in commands:
             ssh_shell.send(command.encode(encoding='utf-8'))
             ssh_shell.send(b'\n')
@@ -115,14 +114,15 @@ def backup_config(device_name, ip, username, password, comm):
         mk.create_log(dis_cu, device_name)
         print(f"{device_name}backup succeed。")
 
-    except:
+
+    except Exception:
         print(f"{device_name}backup failed。")
-        mk.create_errorlog(device_name)
+        mk.create_error_log(device_name)
 
 
-def muti_theard(hosts):
+def multithreading(devices):
     with ThreadPoolExecutor(max_workers=150) as executor:
-        for hn, ip, un, pw, co, nt in zip(*hosts):  # 使用 * 解包 hosts 元组
+        for hn, ip, un, pw, co in zip(*devices):  # 使用 * 解包 hosts 元组
             executor.submit(backup_config, hn, ip, un, pw, co)
 
 
@@ -130,4 +130,4 @@ if __name__ == '__main__':
     mk_dir = CreateFiles()
     mk_dir.mkdir()
     hosts = GetInfo().get_hosts()
-    muti_theard(hosts)
+    multithreading(hosts)
