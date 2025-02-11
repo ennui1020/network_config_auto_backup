@@ -1,11 +1,10 @@
 # 自动备份设备配置脚本 / network_config_auto_backup
 
 ## 概述 / Overview
-
-一个 Python 脚本，通过读取 Excel 文件 (Info.xls) 中的设备凭证，使用 SSH 连接每个设备，并执行 commands 文件夹下的文本命令文件。执行结果将被保存，以便日后查看或备份。
-  
-A Python script that automates network device management by reading device credentials from an Excel file (Info.xls), connecting to each device via SSH, and executing commands from text files in the commands folder. 
-
+<pre>
+  一个 Python 脚本，通过读取 Excel 文件 (Info.xls) 中的设备凭证，使用 SSH 连接每个设备，并执行 commands 文件夹下的文本命令文件。执行结果将被保存，以便日后查看或备份。
+  A Python script that automates network device management by reading device credentials from an Excel file (Info.xls), connecting to each device via SSH, and executing commands from text files in the commands folder.
+</pre>
 ## 文件结构 / File Structure
     .
     ├── main.py
@@ -35,10 +34,15 @@ A Python script that automates network device management by reading device crede
 
 ## 注意事项 / Notes 
 
-1.请确保设备可以从运行脚本的机器访问。 
-  Ensure the devices are reachable from the machine running the script.
+  1.请确保设备可以从运行脚本的机器访问。 
+    Ensure the devices are reachable from the machine running the script.
 
-2.脚本通过 SSH 访问设备。
-  The script use SSH access to network devices.
+  2.脚本通过 SSH 访问设备。
+    The script use SSH access to network devices.
+
+## 许可证 / License 
+  This project is licensed under the MIT License - see the LICENSE file for details.
+  本项目使用 MIT 许可证 - 详情请参阅 LICENSE 文件。
+
 
 
