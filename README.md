@@ -40,9 +40,4 @@ Output: The output from each command will be saved in the output/ folder for fut
   2.脚本通过 SSH 访问设备。  
     The script use SSH access to network devices.
 
-## 许可证 / License 
-  This project is licensed under the MIT License - see the LICENSE file for details.  
-  本项目使用 MIT 许可证 - 详情请参阅 LICENSE 文件。
-
-
 
