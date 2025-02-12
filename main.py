@@ -85,13 +85,13 @@ def backup_config(device_name, ip, username, password, comm):
         ssh.connect(hostname=ip, username=username, password=password)
         ssh_shell = ssh.invoke_shell()
         # get shell
-        time.sleep(1)
+        time.sleep(3)
         stdout = ssh_shell.recv(1024)
         # dis_cu.append(stdout)
         # 判断是否存在修改密码提示
         out = decide_stdout(stdout)
-        time.sleep(1)
         if out == 'y':
+            time.sleep(1)
             ssh_shell.send(b'n\n')
         # 从txt获取命令
         commands = GetInfo.get_commands(comm)
