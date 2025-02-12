@@ -90,6 +90,7 @@ def backup_config(device_name, ip, username, password, comm):
         # dis_cu.append(stdout)
         # 判断是否存在修改密码提示
         out = decide_stdout(stdout)
+        time.sleep(1)
         if out == 'y':
             ssh_shell.send(b'n\n')
         # 从txt获取命令
